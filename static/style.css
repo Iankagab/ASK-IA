@@ -1,0 +1,181 @@
+:root {
+    /* ALTERAÇÃO 1: Cor de fundo principal alterada para #FF5656 */
+    --primary-bg-color: #FF5656; 
+    --chat-bg-color: #FFFFFF;
+    --text-color: #333;
+    --input-bg-color: #F0F0F0;
+    --button-color: #D8A1A3;
+    --button-hover-color: #C78F91;
+    --user-msg-bg: #f1f1f1;
+    --ai-msg-bg: #E1F5FE;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--primary-bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.main-title {
+    color: var(--chat-bg-color); /* Alterado para branco para melhor contraste */
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Sombra para legibilidade */
+}
+
+/* VERSÃO NOVA E CORRIGIDA */
+.chat-container {
+    background-color: var(--chat-bg-color);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    /* ALTERAÇÃO APLICADA AQUI: 
+      - O padding foi ajustado. 
+      - '20px' no topo, '25px' nos lados e '30px' na parte inferior.
+      - Isso levanta o campo de texto, criando o espaço que você pediu.
+    */
+    padding: 20px 25px 30px; 
+    height: 65vh; 
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+#chat-window {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Estilos da tela inicial */
+.initial-view {
+    margin: auto;
+    text-align: center;
+    color: #555;
+}
+
+.initial-view h2 {
+    font-weight: 500;
+    font-size: 1.5rem;
+    line-height: 1.4;
+}
+
+.suggestion-buttons {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.suggestion {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.suggestion:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Estilos do formulário de input */
+.chat-input-area {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+#message-input {
+    flex-grow: 1;
+    border: none;
+    background-color: var(--input-bg-color);
+    border-radius: 20px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    outline: none;
+}
+
+#send-button {
+    background-color: var(--button-color);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+#send-button:hover {
+    background-color: var(--button-hover-color);
+}
+
+#send-button svg {
+    fill: white;
+    /* ALTERAÇÃO 3: Rotação da seta removida para que ela aponte para a direita (sua direção original) */
+    /* transform: rotate(90deg);  <-- LINHA REMOVIDA */
+}
+
+/* Estilos das mensagens do chat (para quando o JS adicionar) */
+.message {
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 75%;
+    line-height: 1.5;
+}
+
+.user-message {
+    background-color: var(--user-msg-bg);
+    align-self: flex-end;
+    border: 1px solid #ddd;
+}
+
+.ai-message {
+    background-color: var(--ai-msg-bg);
+    align-self: flex-start;
+    border: 1px solid #B3E5FC;
+}
+
+/* Adicione estas classes no final do seu style.css */
+
+.ai-thinking, .ai-error {
+    color: #888;
+    font-style: italic;
+    align-self: flex-start;
+}
+
+.ai-error {
+    color: #D32F2F;
+    font-style: normal;
+    font-weight: 500;
+}
