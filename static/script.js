@@ -1,87 +1,79 @@
+// static/script.js - VERSÃO DE DIAGNÓSTICO
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("O script.js foi carregado e está sendo executado.");
+
+    // Seletores dos elementos do DOM
     const chatForm = document.getElementById('chat-form');
     const messageInput = document.getElementById('message-input');
     const chatWindow = document.getElementById('chat-window');
-    const initialView = document.querySelector('.initial-view');
     const suggestionButtons = document.querySelectorAll('.suggestion');
 
-    let isChatStarted = false;
+    // =========== PONTO DE VERIFICAÇÃO 1 ===========
+    // Vamos verificar se os elementos estão sendo encontrados corretamente.
+    console.log("Formulário do chat encontrado:", chatForm);
+    console.log("Campo de input encontrado:", messageInput);
+    console.log("Botões de sugestão encontrados:", suggestionButtons);
+    // ===============================================
 
-    // Função para adicionar uma mensagem à janela do chat
-    const addMessage = (message, sender) => {
-        // Remove a tela inicial se for a primeira mensagem
-        if (initialView && !isChatStarted) {
-            chatWindow.innerHTML = ''; // Limpa a janela de chat
-            isChatStarted = true;
+    // Deixaremos as outras funções aqui por enquanto.
+    const addMessage = (message, senderClass) => {
+        const initialView = document.querySelector('.initial-view');
+        if (initialView) {
+            initialView.remove();
         }
-
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+        messageElement.classList.add('message', senderClass);
         messageElement.textContent = message;
         chatWindow.appendChild(messageElement);
-
-        // Rola para a mensagem mais recente
         chatWindow.scrollTop = chatWindow.scrollHeight;
+        return messageElement;
     };
 
-    // Evento de envio do formulário
-    // Substitua o listener de evento 'submit' antigo por este:
-
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const userMessage = messageInput.value.trim();
-
-    if (userMessage) {
-        addMessage(userMessage, 'user');
+    const handleBackendCommunication = async (messageText) => {
+        if (!messageText) return;
+        addMessage(messageText, 'user-message');
         messageInput.value = '';
-        
-        // Exibe um indicador de que a IA está "pensando"
-        addMessage('Pensando...', 'ai-thinking');
-
+        const thinkingMessageElement = addMessage('Pensando...', 'ai-thinking');
         try {
-            // Chama o nosso backend Python
-            const response = await fetch('/ask', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: userMessage }),
-            });
-
-            if (!response.ok) {
-                throw new Error('A resposta da rede não foi boa.');
-            }
-
+            const response = await fetch('/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: messageText }), });
+            if (!response.ok) throw new Error('Falha na resposta do servidor.');
             const data = await response.json();
-            
-            // Remove a mensagem "Pensando..."
-            const thinkingMessage = document.querySelector('.ai-thinking');
-            if (thinkingMessage) {
-                thinkingMessage.remove();
-            }
-
-            // Adiciona a resposta real do backend
-            addMessage(data.answer, 'ai');
-
+            thinkingMessageElement.remove();
+            addMessage(data.answer, 'ai-message');
         } catch (error) {
             console.error('Erro ao chamar a API:', error);
-            const thinkingMessage = document.querySelector('.ai-thinking');
-            if (thinkingMessage) {
-                // Remove a mensagem "Pensando..." e exibe uma de erro
-                thinkingMessage.textContent = 'Desculpe, ocorreu um erro ao conectar com o servidor.';
-                thinkingMessage.classList.remove('ai-thinking');
-                thinkingMessage.classList.add('ai-error');
-            }
+            thinkingMessageElement.textContent = 'Desculpe, ocorreu um erro.';
+            thinkingMessageElement.classList.remove('ai-thinking');
+            thinkingMessageElement.classList.add('ai-error');
         }
-    }
-});
+    };
 
-    // Evento de clique nos botões de sugestão
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const userMessage = messageInput.value.trim();
+        handleBackendCommunication(userMessage);
+    });
+
+    // =========== PONTO DE VERIFICAÇÃO 2 ===========
+    // Este código é ultra simplificado. Ele vai APENAS tentar colocar
+    // o texto no campo, sem enviar o formulário.
+    console.log("Adicionando listeners de clique aos botões...");
+
     suggestionButtons.forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
+            // Impede qualquer comportamento padrão do formulário ou do botão.
+            event.preventDefault(); 
+            
             const suggestionText = button.textContent;
+
+            console.log("--- BOTÃO CLICADO! ---");
+            console.log("Texto da sugestão:", suggestionText);
+
+            // A linha mais importante para o nosso teste:
             messageInput.value = suggestionText;
-            chatForm.requestSubmit(); // Envia o formulário com o texto da sugestão
+            
+            console.log("Valor do input foi DEFINIDO para:", messageInput.value);
         });
     });
 });

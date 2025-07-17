@@ -6,7 +6,7 @@ from app import app, db, KnowledgeBase
 initial_data = [
     {
         "keywords": "cartório",
-        "response": "Olá! Me conte um pouco mais do que você precisa, e assim poderei de direcionar ao endereço mais acertivo"
+        "response": "Olá! Me conte um pouco mais do que você precisa, e assim poderei te direcionar ao endereço mais assertivo"
     }
 ]
 
