@@ -1,79 +1,200 @@
-// static/script.js - VERSÃO DE DIAGNÓSTICO
-
+// static/script.js
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("O script.js foi carregado e está sendo executado.");
+  const chatForm = document.getElementById('chat-form');
+  const messageInput = document.getElementById('message-input');
+  const chatWindow = document.getElementById('chat-window');
+  const sendButton = document.getElementById('send-button');
 
-    // Seletores dos elementos do DOM
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const chatWindow = document.getElementById('chat-window');
-    const suggestionButtons = document.querySelectorAll('.suggestion');
+  let firstInteractionDone = false;
+  let hasClickedOption = false;
 
-    // =========== PONTO DE VERIFICAÇÃO 1 ===========
-    // Vamos verificar se os elementos estão sendo encontrados corretamente.
-    console.log("Formulário do chat encontrado:", chatForm);
-    console.log("Campo de input encontrado:", messageInput);
-    console.log("Botões de sugestão encontrados:", suggestionButtons);
-    // ===============================================
+  // ---------- Helpers ----------
+  const addBubble = (html, cls) => {
+    const initialView = document.querySelector('.initial-view');
+    if (initialView) initialView.remove();
+    const el = document.createElement('div');
+    el.classList.add('message', cls);
+    el.innerHTML = html;
+    chatWindow.appendChild(el);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return el;
+  };
 
-    // Deixaremos as outras funções aqui por enquanto.
-    const addMessage = (message, senderClass) => {
-        const initialView = document.querySelector('.initial-view');
-        if (initialView) {
-            initialView.remove();
-        }
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', senderClass);
-        messageElement.textContent = message;
-        chatWindow.appendChild(messageElement);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-        return messageElement;
-    };
+  const clearButtonsList = () => {
+    chatWindow.querySelectorAll('.buttons-list').forEach(el => el.remove());
+    chatWindow.querySelectorAll('.actions-row').forEach(el => el.remove()); // remove linha de ações
+  };
 
-    const handleBackendCommunication = async (messageText) => {
-        if (!messageText) return;
-        addMessage(messageText, 'user-message');
-        messageInput.value = '';
-        const thinkingMessageElement = addMessage('Pensando...', 'ai-thinking');
-        try {
-            const response = await fetch('/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: messageText }), });
-            if (!response.ok) throw new Error('Falha na resposta do servidor.');
-            const data = await response.json();
-            thinkingMessageElement.remove();
-            addMessage(data.answer, 'ai-message');
-        } catch (error) {
-            console.error('Erro ao chamar a API:', error);
-            thinkingMessageElement.textContent = 'Desculpe, ocorreu um erro.';
-            thinkingMessageElement.classList.remove('ai-thinking');
-            thinkingMessageElement.classList.add('ai-error');
-        }
-    };
+  const renderOptions = (labels) => {
+    clearButtonsList();
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('buttons-list');
+    labels.forEach(label => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.classList.add('option-btn');
+      btn.textContent = label;
+      btn.addEventListener('click', () => handleOption(label));
+      wrapper.appendChild(btn);
+    });
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  };
 
-    chatForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const userMessage = messageInput.value.trim();
-        handleBackendCommunication(userMessage);
+  const fetchOpcoes = async () => {
+    const res = await fetch('/opcoes');
+    if (!res.ok) throw new Error('Falha ao carregar opções');
+    const data = await res.json();
+    return data.opcoes || [];
+  };
+
+  // ---------- Ações (Retornar | Apagar) ----------
+  const renderActionsRow = () => {
+    if (!hasClickedOption) return;
+
+    // remove uma eventual linha anterior para evitar duplicar
+    const existing = chatWindow.querySelector('.actions-row');
+    if (existing) existing.remove();
+
+    const row = document.createElement('div');
+    row.classList.add('actions-row');
+
+    // Retornar as opções
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.classList.add('back-btn');
+    backBtn.textContent = 'Retornar as opções';
+    backBtn.addEventListener('click', async () => {
+      clearButtonsList();
+      try {
+        const opts = await fetchOpcoes();
+        renderOptions(opts.length ? opts : ['civil', 'criminal', 'eleitoral', 'federal', 'trabalhista']);
+      } catch {
+        renderOptions(['civil', 'criminal', 'eleitoral', 'federal', 'trabalhista']);
+      }
+      // mantém a linha de ações visível após voltar às opções
+      renderActionsRow();
     });
 
-    // =========== PONTO DE VERIFICAÇÃO 2 ===========
-    // Este código é ultra simplificado. Ele vai APENAS tentar colocar
-    // o texto no campo, sem enviar o formulário.
-    console.log("Adicionando listeners de clique aos botões...");
+    // Apagar conversa
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.classList.add('clear-btn');
+    clearBtn.textContent = 'Apagar conversa';
+    clearBtn.addEventListener('click', resetConversation);
 
-    suggestionButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            // Impede qualquer comportamento padrão do formulário ou do botão.
-            event.preventDefault(); 
-            
-            const suggestionText = button.textContent;
+    row.appendChild(backBtn);
+    row.appendChild(clearBtn);
 
-            console.log("--- BOTÃO CLICADO! ---");
-            console.log("Texto da sugestão:", suggestionText);
+    chatWindow.appendChild(row);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  };
 
-            // A linha mais importante para o nosso teste:
-            messageInput.value = suggestionText;
-            
-            console.log("Valor do input foi DEFINIDO para:", messageInput.value);
-        });
-    });
+  // ---------- Reset para o início ----------
+  const renderInitialView = () => {
+    chatWindow.innerHTML = '';
+    const initial = document.createElement('div');
+    initial.classList.add('initial-view');
+    initial.innerHTML = `<h2>Olá cidadão,<br>como posso te ajudar?</h2>`;
+    chatWindow.appendChild(initial);
+
+    const inputBar = document.querySelector('.chat-input-area');
+    if (inputBar) inputBar.classList.remove('hidden');
+
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  };
+
+  const resetConversation = () => {
+    firstInteractionDone = false;
+    hasClickedOption   = false;
+    renderInitialView();
+  };
+
+  // ---------- Clique em uma opção ----------
+  const handleOption = async (opcao) => {
+    const thinking = addBubble('Buscando endereço...', 'ai-thinking');
+    try {
+      const res = await fetch(`/endereco?opcao=${encodeURIComponent(opcao)}`);
+      if (!res.ok) throw new Error('Falha na resposta do servidor');
+      const data = await res.json();
+      thinking.remove();
+
+      if (data.count && Array.isArray(data.resultados) && data.resultados.length > 0) {
+        const rows = data.resultados.map(r => {
+          const tel = r.telefone && String(r.telefone).trim() ? r.telefone : "-";
+          return `
+            <tr>
+              <td class="td-orgao"><strong>${r.nome}</strong></td>
+              <td class="td-end">${r.endereco_completo}</td>
+              <td class="td-tel">${tel}</td>
+            </tr>
+          `;
+        }).join("");
+
+        addBubble(`
+          <div class="addr-table">
+            <table class="result-table" aria-label="Órgãos e endereços encontrados">
+              <thead>
+                <tr>
+                  <th>Órgão</th>
+                  <th>Endereço</th>
+                  <th>Telefone</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `, 'ai-endereco');
+      } else {
+        addBubble(data.message || `Não encontrei endereços para <strong>${opcao}</strong>.`, 'ai-error');
+      }
+
+      hasClickedOption = true;
+      renderActionsRow(); // exibe a linha com os dois botões lado a lado
+    } catch (err) {
+      console.error(err);
+      thinking.textContent = 'Erro ao buscar endereço.';
+      thinking.classList.remove('ai-thinking');
+      thinking.classList.add('ai-error');
+      hasClickedOption = true;
+      renderActionsRow();
+    }
+  };
+
+  // ---------- Primeira interação ----------
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (firstInteractionDone) return;
+
+    const text = messageInput.value.trim();
+    if (!text) return;
+
+    addBubble(text, 'user-message');
+    messageInput.value = '';
+    sendButton.disabled = true;
+
+    addBubble(`
+      <strong>Olá Cidadão!</strong><br/>
+      Sou o <strong>ASK-IA</strong> e estou aqui para te auxiliar a encontrar o órgão competente mais próximo de você de acordo com a sua necessidade.<br/><br/>
+      Abaixo uma lista dos serviços jurídicos que podem te ajudar:
+    `, 'ai-greeting');
+
+    try {
+      const opcoes = await fetchOpcoes();
+      renderOptions(opcoes.length ? opcoes : ['civil', 'criminal', 'eleitoral', 'federal', 'trabalhista']);
+    } catch {
+      renderOptions(['civil', 'criminal', 'eleitoral', 'federal', 'trabalhista']);
+    } finally {
+      firstInteractionDone = true;
+      const inputBar = document.querySelector('.chat-input-area');
+      if (inputBar) inputBar.classList.add('hidden');
+      sendButton.disabled = false;
+    }
+  });
+
+  // Garante initial view ao carregar se o chat estiver vazio
+  if (!chatWindow.querySelector('.initial-view') && chatWindow.children.length === 0) {
+    renderInitialView();
+  }
 });
+

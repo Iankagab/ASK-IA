@@ -4,104 +4,88 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import os
 
-# --- CONFIGURAÇÃO ---
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'minha-chave-secreta'  # necessário para Flask-Admin
+# ---------------------------
+# App + Config
+# ---------------------------
+app = Flask(
+    __name__,
+    static_url_path="/static",
+    static_folder="static",
+    template_folder="templates"
+)
 
-# Inicializa o banco
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config.update(
+    SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'database.db'),
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    SECRET_KEY='minha-chave-secreta',
+    SEND_FILE_MAX_AGE_DEFAULT=0,
+    TEMPLATES_AUTO_RELOAD=True,
+)
+
+app.jinja_env.cache = {}
 db = SQLAlchemy(app)
 
-# --- MODELOS DO BANCO DE DADOS ---
-class KnowledgeBase(db.Model):
+# ---------------------------
+# Modelo ÚNICO (CSV)
+# ---------------------------
+class OrgaoJudiciario(db.Model):
+    __tablename__ = 'orgao_judiciario'
     id = db.Column(db.Integer, primary_key=True)
-    keywords = db.Column(db.String(300), nullable=False)  # palavras separadas por vírgula
-    response = db.Column(db.Text, nullable=False)
+    tipo = db.Column(db.String(120), nullable=False, index=True)   # ex: "Civil", "Criminal"
+    nome = db.Column(db.String(255), nullable=False)               # ex: "Fórum XYZ"
+    endereco_completo = db.Column(db.String(500), nullable=False)  # endereço completo
+    telefone = db.Column(db.String(120), nullable=True)            # telefone (pode ser nulo)
 
     def __repr__(self):
-        return f'<Knowledge {self.keywords}>'
+        return f'<OrgaoJudiciario {self.tipo} - {self.nome}>'
 
-class UserResponse(db.Model):
-    __tablename__ = 'userresponse'  # força o nome da tabela
-    id = db.Column(db.Integer, primary_key=True)
-    user_message = db.Column(db.Text, nullable=False)
-    response_given = db.Column(db.Text, nullable=False)
-
-class Orgao(db.Model):
-    __tablename__ = 'orgao'  # nome da tabela
-    id = db.Column(db.Integer, primary_key=True)
-    orgao = db.Column(db.String(100), nullable=False)
-    cidade_estado = db.Column(db.String(100), nullable=False)
-    endereco = db.Column(db.String(200), nullable=False)
-
-# --- INTEGRAÇÃO FLASK-ADMIN ---
+# ---------------------------
+# Admin (apenas a nova tabela)
+# ---------------------------
 admin = Admin(app, name='Painel Admin', template_mode='bootstrap3')
-admin.add_view(ModelView(KnowledgeBase, db.session))
-admin.add_view(ModelView(UserResponse, db.session))
-admin.add_view(ModelView(Orgao, db.session))
+admin.add_view(ModelView(OrgaoJudiciario, db.session))
 
-# --- ROTAS DA APLICAÇÃO ---
+# ---------------------------
+# Rotas
+# ---------------------------
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/ask', methods=['POST'])
-def ask():
-    user_message = request.get_json().get('message')
+@app.route('/opcoes', methods=['GET'])
+def listar_opcoes():
+    """Retorna os tipos distintos disponíveis em orgao_judiciario."""
+    tipos = db.session.query(OrgaoJudiciario.tipo).distinct().order_by(OrgaoJudiciario.tipo.asc()).all()
+    tipos = [t[0] for t in tipos]
+    return jsonify({"count": len(tipos), "opcoes": tipos})
 
-    if not user_message:
-        return jsonify({'error': 'Nenhuma mensagem recebida'}), 400
+@app.route('/endereco', methods=['GET'])
+def obter_endereco():
+    """
+    GET /endereco?opcao=Tipo
+    Retorna lista de órgãos com nome, endereço e telefone.
+    """
+    opcao = request.args.get('opcao', '').strip()
+    if not opcao:
+        return jsonify({'error': 'Informe a opção.'}), 400
 
-    response_text = find_response_for_message(user_message)
+    regs = OrgaoJudiciario.query.filter_by(tipo=opcao).order_by(OrgaoJudiciario.nome.asc()).all()
+    resultados = [{
+        "nome": r.nome,
+        "endereco_completo": r.endereco_completo,
+        "telefone": r.telefone or ""
+    } for r in regs]
 
-    # Salva resposta do usuário + resposta do chatbot no banco (tabela userresponse)
-    user_response = UserResponse(user_message=user_message, response_given=response_text)
-    db.session.add(user_response)
-    db.session.commit()
+    if not resultados:
+        return jsonify({"count": 0, "resultados": [], "message": "Nenhum endereço cadastrado para essa opção."}), 200
 
-    return jsonify({'answer': response_text})
+    return jsonify({"count": len(resultados), "resultados": resultados})
 
-def find_response_for_message(message):
-    message_words = set(message.lower().split())
-    all_knowledge = KnowledgeBase.query.all()
-
-    for entry in all_knowledge:
-        entry_keywords = set(k.strip() for k in entry.keywords.lower().split(','))
-        if not message_words.isdisjoint(entry_keywords):
-            return entry.response
-
-    return "Desculpe, não entendi sua pergunta. Pode tentar reformulá-la com outras palavras?"
-
-def buscar_orgaos_com_base_em_respostas():
-    # Busca todas as respostas armazenadas
-    respostas = UserResponse.query.all()
-
-    atributos = set()
-    for r in respostas:
-        palavras = r.response_given.lower().split()
-        atributos.update(palavras)
-
-    orgaos = Orgao.query.filter(Orgao.attribute.in_(atributos)).all()
-    return orgaos
-
-@app.route('/orgaos')
-def orgaos():
-    orgaos_encontrados = Orgao.query.all()  # ou use a sua lógica de busca
-    lista = []
-    for o in orgaos_encontrados:
-        lista.append({
-            'orgao': o.orgao,
-            'cidade_estado': o.cidade_estado,
-            'endereco': o.endereco
-        })
-    return jsonify({'orgaos': lista})
-
-
-# Rodar a aplicação
+# ---------------------------
+# Bootstrap
+# ---------------------------
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        db.create_all()  # cria só orgao_judiciario
     app.run(debug=True)
-

@@ -1,37 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ask IA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASK IA</title>
+
+  <!-- bump de versão pra forçar recarregar CSS/JS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=8) }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
 </head>
 <body>
-    <div class="main-container">
-        <h1 class="main-title">ASK IA</h1>
-        <div class="chat-container">
-            <div id="chat-window">
-                <div class="initial-view">
-                    <h2>Olá cidadão, <br>como posso te ajudar?</h2>
-                    <div class="suggestion-buttons">
-                        <button class="suggestion">Qual o cartório mais próximo?</button>
-                        <button class="suggestion">Qual o endereço mais próximo?</button>
-                        <button class="suggestion">Qual é a legislação para idosos?</button>
-                    </div>
-                </div>
-            </div>
-            <form id="chat-form" class="chat-input-area">
-                <input type="text" id="message-input" placeholder="Pergunte-me" autocomplete="off">
-                <button type="submit" id="send-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7v-2h4V7l5 5-5 5z"/>
-                    </svg>
-                </button>
-            </form>
-        </div>
+  <div class="main-container">
+    <!-- TÍTULO + ÍCONE DE INFO (fora do chat-container) -->
+    <div class="title-row">
+      <h1 class="main-title">ASK IA</h1>
+
+      <div class="info-tooltip">
+        <span class="info-icon" aria-hidden="true">i</span>
+        <span class="tooltip-text">
+          Nesta primeira versão o ASK IA possui os dados somente da cidade de Jaraguá do Sul/SC.
+        </span>
+      </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- CONTAINER DO CHAT -->
+    <div class="chat-container">
+      <div id="chat-window">
+        <div class="initial-view">
+          <h2>Olá cidadão,<br>como posso te ajudar?</h2>
+        </div>
+      </div>
+
+      <form id="chat-form" class="chat-input-area">
+        <input type="text" id="message-input" placeholder="Pergunte-me" autocomplete="off">
+        <button type="submit" id="send-button" aria-label="Enviar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7v-2h4V7l5 5-5 5z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js', v=8) }}"></script>
 </body>
 </html>

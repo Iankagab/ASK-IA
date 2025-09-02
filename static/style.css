@@ -1,181 +1,264 @@
 :root {
-    /* ALTERAÇÃO 1: Cor de fundo principal alterada para #FF5656 */
-    --primary-bg-color: #FF5656; 
-    --chat-bg-color: #FFFFFF;
-    --text-color: #333;
-    --input-bg-color: #F0F0F0;
-    --button-color: #D8A1A3;
-    --button-hover-color: #C78F91;
-    --user-msg-bg: #f1f1f1;
-    --ai-msg-bg: #E1F5FE;
+  --primary-bg-color: #FF5656; 
+  --chat-bg-color: #FFFFFF;
+  --text-color: #333;
+  --input-bg-color: #F0F0F0;
+  --button-color: #D8A1A3;
+  --button-hover-color: #C78F91;
+  --user-msg-bg: #f1f1f1;
+  --ai-msg-bg: #E1F5FE;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--primary-bg-color);
-    color: var(--text-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--primary-bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
 }
 
-.main-container {
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-}
+.main-container { width: 100%; max-width: 1500px; text-align: center; }
 
 .main-title {
-    color: var(--chat-bg-color); /* Alterado para branco para melhor contraste */
-    font-weight: 700;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Sombra para legibilidade */
+  color: var(--chat-bg-color);
+  font-weight: 700;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* VERSÃO NOVA E CORRIGIDA */
 .chat-container {
-    background-color: var(--chat-bg-color);
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    /* ALTERAÇÃO APLICADA AQUI: 
-      - O padding foi ajustado. 
-      - '20px' no topo, '25px' nos lados e '30px' na parte inferior.
-      - Isso levanta o campo de texto, criando o espaço que você pediu.
-    */
-    padding: 20px 25px 30px; 
-    height: 65vh; 
-    max-width: 700px;
-    margin: 0 auto;
+  background-color: var(--chat-bg-color);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 25px 30px;
+  height: 65vh;
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
 #chat-window {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-/* Estilos da tela inicial */
-.initial-view {
-    margin: auto;
-    text-align: center;
-    color: #555;
-}
+/* Initial view */
+.initial-view { margin: auto; text-align: center; color: #555; }
+.initial-view h2 { font-weight: 500; font-size: 1.5rem; line-height: 1.4; }
 
-.initial-view h2 {
-    font-weight: 500;
-    font-size: 1.5rem;
-    line-height: 1.4;
-}
+.suggestion:hover { background-color: #f5f5f5; color: #333; }
 
-.suggestion-buttons {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.suggestion {
-    background: none;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #666;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.suggestion:hover {
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-/* Estilos do formulário de input */
+/* Input */
 .chat-input-area {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
 }
-
 #message-input {
-    flex-grow: 1;
-    border: none;
-    background-color: var(--input-bg-color);
-    border-radius: 20px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    outline: none;
+  flex-grow: 1;
+  border: none;
+  background-color: var(--input-bg-color);
+  border-radius: 20px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  outline: none;
 }
-
 #send-button {
-    background-color: var(--button-color);
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: background-color 0.3s;
+  background-color: var(--button-color);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s;
 }
+#send-button:hover { background-color: var(--button-hover-color); }
+#send-button svg { fill: white; }
 
-#send-button:hover {
-    background-color: var(--button-hover-color);
-}
-
-#send-button svg {
-    fill: white;
-    /* ALTERAÇÃO 3: Rotação da seta removida para que ela aponte para a direita (sua direção original) */
-    /* transform: rotate(90deg);  <-- LINHA REMOVIDA */
-}
-
-/* Estilos das mensagens do chat (para quando o JS adicionar) */
+/* Mensagens */
 .message {
-    padding: 12px 18px;
-    border-radius: 18px;
-    max-width: 75%;
-    line-height: 1.5;
+  padding: 12px 18px;
+  border-radius: 18px;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.user-message { background-color: var(--user-msg-bg); align-self: flex-end; border: 1px solid #ddd; }
+.ai-message { background-color: var(--ai-msg-bg); align-self: flex-start; border: 1px solid #B3E5FC; }
+.ai-thinking, .ai-error { color: #888; font-style: italic; align-self: flex-start; }
+.ai-error { color: #D32F2F; font-style: normal; font-weight: 500; }
+
+/* Saudação e tabela em rosinha */
+.ai-greeting, .ai-endereco {
+  background-color: #FFE5E8;
+  border: 1px solid #F5B9BF;
+  align-self: flex-start;
 }
 
-.user-message {
-    background-color: var(--user-msg-bg);
-    align-self: flex-end;
-    border: 1px solid #ddd;
+/* Opções (à esquerda) */
+.buttons-list {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.ai-message {
-    background-color: var(--ai-msg-bg);
-    align-self: flex-start;
-    border: 1px solid #B3E5FC;
+/* Botões de opção */
+.option-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  transition: background-color 0.3s, color 0.3s;
+}
+.option-btn:hover { background-color: #f5f5f5; color: #333; }
+
+/* Botão voltar */
+.back-btn {
+  background-color: var(--button-color);
+  color: #fff;
+  border: 1px solid var(--button-color);
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, opacity 0.2s;
+}
+.back-btn:hover { background-color: var(--button-hover-color); }
+.back-btn:active { opacity: 0.9; }
+
+/* Ações à direita (Apagar conversa) */
+.right-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.clear-btn {
+  background-color: #e0e0e0;   /* cinza */
+  color: #333;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.clear-btn:hover { background-color: #d5d5d5; }
+.clear-btn:active { opacity: 0.9; }
+
+/* Tabela */
+.addr-table { margin-top: 6px; overflow-x: auto; }
+.result-table { width: 100%; border-collapse: collapse; min-width: 600px; background: #fff; }
+.result-table thead th {
+  text-align: left; font-weight: 600; padding: 10px 12px;
+  border: 1px solid #F5B9BF; background-color: #FFD9DD; white-space: nowrap;
+}
+.result-table tbody td {
+  padding: 10px 12px; border: 1px solid #F5B9BF; vertical-align: top; word-break: break-word;
+}
+.td-orgao { width: 28%; } .td-end { width: 56%; } .td-tel { width: 16%; white-space: nowrap; }
+
+@media (max-width: 560px) {
+  .result-table { min-width: 520px; }
 }
 
-/* Adicione estas classes no final do seu style.css */
+/* utilitário */
+.hidden { display: none !important; }
 
-.ai-thinking, .ai-error {
-    color: #888;
-    font-style: italic;
-    align-self: flex-start;
+/* linha com "Retornar as opções" + "Apagar conversa" lado a lado */
+.actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.ai-error {
-    color: #D32F2F;
-    font-style: normal;
-    font-weight: 500;
+.back-btn {
+  background-color: var(--button-color);
+  color: #fff;
+  border: 1px solid var(--button-color);
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, opacity 0.2s;
 }
+.back-btn:hover { background-color: var(--button-hover-color); }
+
+.clear-btn {
+  background-color: #e0e0e0;
+  color: #333;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.clear-btn:hover { background-color: #d5d5d5; }
+
+/* Linha do título com ícone ao lado */
+.title-row {
+  display: flex;
+  align-items: flex-start;  /* antes estava center */
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Ícone redondo rosa ao lado do título */
+.info-tooltip { position: relative; display: inline-block; }
+.info-icon {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--button-color);   /* rosa do tema */
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  user-select: none;
+  transition: background .25s ease;
+}
+.info-icon:hover { background: var(--button-hover-color); }
+
+/* Tooltip abaixo do ícone */
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: calc(100% + 8px);   /* logo abaixo do ícone */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #333;
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: opacity .2s ease;
+  z-index: 5;
+  box-shadow: 0 6px 18px rgba(0,0,0,.15);
+}
+.info-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
