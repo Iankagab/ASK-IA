@@ -2,12 +2,10 @@ import csv
 import os
 from app import app, db, OrgaoJudiciario
 
-# Nome do arquivo CSV
 CSV_FILE = "orgaos_judiciarios_jaragua_do_sul_com_telefones.csv"
 
 def importar_csv():
     with app.app_context():
-        # Garante que a tabela existe
         db.create_all()
 
         with open(CSV_FILE, newline='', encoding="utf-8") as f:

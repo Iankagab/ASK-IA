@@ -1,4 +1,3 @@
-// static/script.js
 document.addEventListener('DOMContentLoaded', () => {
   const chatForm = document.getElementById('chat-form');
   const messageInput = document.getElementById('message-input');
@@ -8,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let firstInteractionDone = false;
   let hasClickedOption = false;
 
-  // ---------- Helpers ----------
   const addBubble = (html, cls) => {
     const initialView = document.querySelector('.initial-view');
     if (initialView) initialView.remove();
@@ -48,18 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return data.opcoes || [];
   };
 
-  // ---------- Ações (Retornar | Apagar) ----------
   const renderActionsRow = () => {
     if (!hasClickedOption) return;
 
-    // remove uma eventual linha anterior para evitar duplicar
     const existing = chatWindow.querySelector('.actions-row');
     if (existing) existing.remove();
 
     const row = document.createElement('div');
     row.classList.add('actions-row');
 
-    // Retornar as opções
     const backBtn = document.createElement('button');
     backBtn.type = 'button';
     backBtn.classList.add('back-btn');
@@ -72,11 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch {
         renderOptions(['civil', 'criminal', 'eleitoral', 'federal', 'trabalhista']);
       }
-      // mantém a linha de ações visível após voltar às opções
       renderActionsRow();
     });
 
-    // Apagar conversa
     const clearBtn = document.createElement('button');
     clearBtn.type = 'button';
     clearBtn.classList.add('clear-btn');
@@ -90,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     chatWindow.scrollTop = chatWindow.scrollHeight;
   };
 
-  // ---------- Reset para o início ----------
   const renderInitialView = () => {
     chatWindow.innerHTML = '';
     const initial = document.createElement('div');
@@ -110,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderInitialView();
   };
 
-  // ---------- Clique em uma opção ----------
   const handleOption = async (opcao) => {
     const thinking = addBubble('Buscando endereço...', 'ai-thinking');
     try {
@@ -150,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       hasClickedOption = true;
-      renderActionsRow(); // exibe a linha com os dois botões lado a lado
+      renderActionsRow(); 
     } catch (err) {
       console.error(err);
       thinking.textContent = 'Erro ao buscar endereço.';
@@ -161,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ---------- Primeira interação ----------
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (firstInteractionDone) return;
@@ -192,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Garante initial view ao carregar se o chat estiver vazio
   if (!chatWindow.querySelector('.initial-view') && chatWindow.children.length === 0) {
     renderInitialView();
   }

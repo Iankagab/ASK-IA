@@ -1,4 +1,3 @@
-# create_db_csv.py
 import os
 import pandas as pd
 from app import app, db, OrgaoJudiciario
@@ -8,7 +7,6 @@ CSV_PATH = os.path.join(os.path.dirname(__file__), "orgaos_judiciarios_jaragua_d
 def importar_csv(reset=False):
     with app.app_context():
         if reset:
-            # Limpa a tabela nova
             db.session.query(OrgaoJudiciario).delete()
             db.session.commit()
 
@@ -18,7 +16,6 @@ def importar_csv(reset=False):
 
         df = pd.read_csv(CSV_PATH)
 
-        # Espera colunas: tipo, nome, endereco_completo, telefone
         colunas_esperadas = {"tipo", "nome", "endereco_completo", "telefone"}
         if not colunas_esperadas.issubset(set(df.columns)):
             raise ValueError(f"CSV deve conter colunas {colunas_esperadas}, mas tem {set(df.columns)}")

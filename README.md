@@ -9,4 +9,6 @@ Roda o flash run e ja aparece
 
 Aplicação: http://127.0.0.1:5000/
 DB: http://localhost:5000/admin
+Dominio: https://ask-ia.fly.dev/
+FLY.IO
 

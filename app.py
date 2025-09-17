@@ -1,13 +1,9 @@
-# app.py
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import os
 
-# ---------------------------
-# App + Config
-# ---------------------------
 app = Flask(
     __name__,
     static_url_path="/static",
@@ -15,7 +11,6 @@ app = Flask(
     template_folder="templates",
 )
 
-# Caminho do banco: usa /data (volume do Fly) se existir; senão, usa local
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = "/data/database.db" if os.path.exists("/data") else os.path.join(basedir, "database.db")
 
@@ -29,14 +24,8 @@ app.config.update(
 
 app.jinja_env.cache = {}
 
-# ---------------------------
-# DB
-# ---------------------------
 db = SQLAlchemy(app)
 
-# ---------------------------
-# Modelo
-# ---------------------------
 class OrgaoJudiciario(db.Model):
     __tablename__ = "orgao_judiciario"
     id = db.Column(db.Integer, primary_key=True)
@@ -48,15 +37,9 @@ class OrgaoJudiciario(db.Model):
     def __repr__(self):
         return f"<OrgaoJudiciario {self.tipo} - {self.nome}>"
 
-# ---------------------------
-# Admin
-# ---------------------------
 admin = Admin(app, name="Painel Admin", template_mode="bootstrap3")
 admin.add_view(ModelView(OrgaoJudiciario, db.session))
 
-# ---------------------------
-# Rotas
-# ---------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -90,14 +73,8 @@ def obter_endereco():
 
     return jsonify({"count": len(resultados), "resultados": resultados})
 
-# ---------------------------
-# Inicialização do banco
-# ---------------------------
 with app.app_context():
     db.create_all()
 
-# ---------------------------
-# Dev local
-# ---------------------------
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
