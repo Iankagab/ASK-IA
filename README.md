@@ -42,4 +42,4 @@ O projeto estará disponível em:
 ## 🌐 Acesso em produção
 
 O chatbot também está disponível em nuvem via Fly.io:
-👉 Acessar aplicação online
+👉 https://ask-ia.fly.dev/
